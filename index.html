@@ -31,6 +31,7 @@
 
       <div class="container hidden" id="test-screen">
         <div class="test-header">
+          <button id="back-home-btn" class="secondary-btn back-btn hidden">Ortga</button>
           <div id="range-display" class="range-badge">1 - 25 gacha savollar</div>
           <button id="finish-test-btn" class="primary-btn finish-btn">Testni yakunlash</button>
         </div>
@@ -64,6 +65,19 @@
       <footer class="branding">
         by omankuloff tel+998933786886
       </footer>
+
+      <!-- Exit Confirmation Modal -->
+      <div id="exit-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <h3>Test hali yakunlanmadi</h3>
+          <p>Haqiqatan ham chiqib ketmoqchimisiz? Tanlang:</p>
+          <div class="modal-actions">
+            <button id="modal-continue-btn" class="secondary-btn">Davom etish</button>
+            <button id="modal-exit-btn" class="danger-btn">Chiqish</button>
+            <button id="modal-finish-btn" class="primary-btn finish-btn">Yakunlash</button>
+          </div>
+        </div>
+      </div>
     </div>
     <script type="module" src="/main.js"></script>
   </body>
