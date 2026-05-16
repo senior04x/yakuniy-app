@@ -81,7 +81,7 @@ async function init() {
         if (!response.ok) throw new Error('Fayl topilmadi');
         const text = await response.text();
         allQuestions = parseContent(text);
-        
+
         loaderContainer.classList.add('hidden');
         renderRanges();
     } catch (err) {
@@ -116,10 +116,10 @@ function renderRanges() {
         const end = Math.min(start + SET_SIZE, totalQuestions);
         const rangeKey = `score_${start}_${end}`;
         const savedScore = localStorage.getItem(rangeKey);
-        
+
         const btn = document.createElement('div');
         btn.className = 'range-btn';
-        
+
         let scoreHtml = '';
         if (savedScore !== null) {
             try {
@@ -135,7 +135,7 @@ function renderRanges() {
             <div class="range-info">${end - start} ta savol</div>
             ${scoreHtml}
         `;
-        
+
         btn.addEventListener('click', (e) => {
             if (e.target.closest('.review-link')) {
                 e.stopPropagation();
@@ -152,7 +152,7 @@ function renderRanges() {
     fullBtn.className = 'range-btn full-shuffle-btn';
     const fullRangeKey = 'score_full_shuffle';
     const savedFull = localStorage.getItem(fullRangeKey);
-    
+
     let fullScoreHtml = '';
     if (savedFull !== null) {
         try {
@@ -186,7 +186,7 @@ function startFullShuffleTest() {
         ...q,
         shuffledOptions: shuffle([...q.options])
     }));
-    
+
     userAnswers = {};
     isTestActive = true;
     isReviewMode = false;
@@ -219,7 +219,7 @@ function startReviewMode(rangeKey) {
     userAnswers = data.userAnswers;
     isTestActive = false;
     isReviewMode = true;
-    
+
     setupScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
     testScreen.classList.remove('hidden');
@@ -227,14 +227,14 @@ function startReviewMode(rangeKey) {
     rangeDisplay.innerText = `Natijalarni ko'rish`;
     isTestActive = false;
     isReviewMode = true;
-    
+
     // Hide all finish buttons and bottom footer one
     document.querySelectorAll('.finish-btn').forEach(btn => btn.classList.add('hidden'));
-    backHomeBtn.classList.remove('hidden'); 
-    
+    backHomeBtn.classList.remove('hidden');
+
     renderQuestions(true); // true means review mode
     renderNavigator();
-    
+
     // In review mode, we should show the correct/wrong indicators immediately
     setTimeout(() => {
         currentTestSet.forEach((q, qIdx) => {
@@ -242,11 +242,11 @@ function startReviewMode(rangeKey) {
             if (!qDiv) return;
             const optsDiv = qDiv.querySelector('.options-container');
             const selectedText = userAnswers[qIdx];
-            
+
             Array.from(optsDiv.children).forEach(child => {
                 const optText = child.innerText;
                 const isCorrect = q.options.find(o => o.text === optText)?.isCorrect;
-                
+
                 if (isCorrect) {
                     child.classList.add('correct');
                 }
@@ -266,7 +266,7 @@ function startTestRange(start, end, rangeKey) {
         ...q,
         shuffledOptions: shuffle([...q.options])
     })));
-    
+
     userAnswers = {};
     isTestActive = true;
     isReviewMode = false;
@@ -296,15 +296,15 @@ function renderQuestions(isReview = false) {
         const qDiv = document.createElement('div');
         qDiv.className = 'question-item';
         qDiv.id = `q-${qIdx}`;
-        
+
         const h3 = document.createElement('h3');
         h3.innerText = `${qIdx + 1}. ${q.question}`;
         qDiv.appendChild(h3);
-        
+
         const optsDiv = document.createElement('div');
         optsDiv.className = 'options-container';
         if (isReview) optsDiv.style.pointerEvents = 'none';
-        
+
         q.shuffledOptions.forEach(opt => {
             const optCard = document.createElement('div');
             optCard.className = 'option-card';
@@ -321,7 +321,7 @@ function renderQuestions(isReview = false) {
             });
             optsDiv.appendChild(optCard);
         });
-        
+
         qDiv.appendChild(optsDiv);
         questionsList.appendChild(qDiv);
     });
@@ -354,20 +354,20 @@ function updateNavigator(qIdx) {
 function finishTest() {
     isTestActive = false;
     let score = 0;
-    
+
     currentTestSet.forEach((q, qIdx) => {
         const qDiv = document.getElementById(`q-${qIdx}`);
         const optsDiv = qDiv.querySelector('.options-container');
         const selectedText = userAnswers[qIdx];
-        
+
         Array.from(optsDiv.children).forEach(child => {
             const optText = child.innerText;
             const originalOpt = q.options.find(o => o.text === optText);
-            
+
             if (originalOpt.isCorrect) {
                 child.classList.add('correct');
             }
-            
+
             if (selectedText === optText) {
                 if (originalOpt.isCorrect) {
                     score++;
@@ -405,7 +405,7 @@ function finishTest() {
         } else if (score === 24) {
             msg = `Ha Chumo 24 ta ishlagansan 1 tayam xato qiladimi`;
         } else {
-            msg = `A'lo natija! Mukammal! 25 ta ishlabsan!`;
+            msg = `25 ta ishlabman deb kibirlanma`;
         }
 
         document.getElementById('result-message').innerText = msg;
