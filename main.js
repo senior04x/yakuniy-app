@@ -314,10 +314,28 @@ function renderQuestions(isReview = false) {
             optCard.innerText = opt.text;
             optCard.addEventListener('click', () => {
                 if (isReview) return;
-                Array.from(optsDiv.children).forEach(child => child.classList.remove('selected'));
+                
+                // Javob belgilangan bo'lsa qayta tanlashni to'xtatish
+                if (qIdx in userAnswers) return;
+
                 optCard.classList.add('selected');
                 userAnswers[qIdx] = opt.text;
                 updateNavigator(qIdx);
+
+                // Darhol to'g'ri yoki xatoni ko'rsatish
+                const originalOpt = q.options.find(o => o.text === opt.text);
+                if (originalOpt.isCorrect) {
+                    optCard.classList.add('correct');
+                } else {
+                    optCard.classList.add('wrong');
+                    // Xato javob belgilanganida to'g'risini ham yashil qilib ko'rsatish
+                    Array.from(optsDiv.children).forEach(child => {
+                        const childOriginalOpt = q.options.find(o => o.text === child.innerText);
+                        if (childOriginalOpt && childOriginalOpt.isCorrect) {
+                            child.classList.add('correct');
+                        }
+                    });
+                }
             });
             optsDiv.appendChild(optCard);
         });
