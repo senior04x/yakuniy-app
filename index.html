@@ -14,9 +14,22 @@
 
 <body>
   <div id="app">
-    <div class="container" id="setup-screen">
+    <!-- Subject Selection Screen -->
+    <div class="container" id="subject-screen">
       <header>
-        <h1>Xalqaro moliyadan</h1>
+        <h1>Fanlarni tanlang</h1>
+      </header>
+      <div class="input-area">
+        <button id="subject-xalqaro-btn" class="primary-btn" style="margin-bottom:15px; width:100%">Xalqaro moliyadan</button>
+        <button id="subject-islomiy-btn" class="primary-btn" style="margin-bottom:15px; width:100%">Islomiy Bank ishidan</button>
+      </div>
+    </div>
+
+    <!-- Range Selection Screen (Initially hidden) -->
+    <div class="container hidden" id="setup-screen">
+      <header>
+        <button id="back-to-subject-btn" class="secondary-btn back-btn" style="margin-bottom:15px">Ortga</button>
+        <h1 id="setup-title">Xalqaro moliyadan</h1>
       </header>
 
       <div class="input-area" id="input-area">

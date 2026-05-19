@@ -4,7 +4,14 @@ let allQuestions = [];
 let currentTestSet = [];
 let userAnswers = {}; // { questionIndex: selectedOptionText }
 let currentRangeKey = '';
+let currentSubject = 'xalqaro';
 const SET_SIZE = 25;
+
+const subjectScreen = document.getElementById('subject-screen');
+const setupTitle = document.getElementById('setup-title');
+const subjectXalqaroBtn = document.getElementById('subject-xalqaro-btn');
+const subjectIslomiyBtn = document.getElementById('subject-islomiy-btn');
+const backToSubjectBtn = document.getElementById('back-to-subject-btn');
 
 const setupScreen = document.getElementById('setup-screen');
 const testScreen = document.getElementById('test-screen');
@@ -70,14 +77,43 @@ function goToHome() {
     isReviewMode = false;
     testScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
+    subjectScreen.classList.add('hidden');
     setupScreen.classList.remove('hidden');
     exitModal.classList.add('hidden'); // Ensure modal is hidden
     renderRanges();
 }
 
-async function init() {
+function init() {
+    subjectXalqaroBtn.addEventListener('click', () => loadSubject('xalqaro'));
+    subjectIslomiyBtn.addEventListener('click', () => loadSubject('islomiy'));
+    backToSubjectBtn.addEventListener('click', goToSubjects);
+}
+
+function goToSubjects() {
+    setupScreen.classList.add('hidden');
+    testScreen.classList.add('hidden');
+    resultScreen.classList.add('hidden');
+    subjectScreen.classList.remove('hidden');
+    allQuestions = [];
+}
+
+async function loadSubject(subject) {
+    currentSubject = subject;
+    subjectScreen.classList.add('hidden');
+    setupScreen.classList.remove('hidden');
+    loaderContainer.classList.remove('hidden');
+    rangeContainer.innerHTML = '';
+    rangeContainer.appendChild(loaderContainer);
+    
+    if (subject === 'xalqaro') {
+        setupTitle.innerText = "Xalqaro moliyadan";
+    } else {
+        setupTitle.innerText = "Islomiy Bank ishidan";
+    }
+
     try {
-        const response = await fetch('/test.md');
+        const fileName = subject === 'xalqaro' ? '/test.md' : '/test2.md';
+        const response = await fetch(fileName);
         if (!response.ok) throw new Error('Fayl topilmadi');
         const text = await response.text();
         allQuestions = parseContent(text);
@@ -97,11 +133,19 @@ function parseContent(text) {
     return blocks.map(block => {
         const parts = block.split(/\s*={3,}\s*/).map(p => p.trim()).filter(p => p.length > 0);
         const question = parts[0];
+        
+        let hasHash = false;
         const options = parts.slice(1).map(opt => {
             const isCorrect = /^\s*#/.test(opt);
+            if (isCorrect) hasHash = true;
             const cleanText = opt.replace(/^\s*#/, '').trim();
             return { text: cleanText, isCorrect: isCorrect };
         });
+
+        if (!hasHash && options.length > 0) {
+            options[0].isCorrect = true;
+        }
+
         return { question, options };
     });
 }
@@ -114,7 +158,7 @@ function renderRanges() {
     for (let i = 0; i < numRanges; i++) {
         const start = i * SET_SIZE;
         const end = Math.min(start + SET_SIZE, totalQuestions);
-        const rangeKey = `score_${start}_${end}`;
+        const rangeKey = `score_${currentSubject}_${start}_${end}`;
         const savedScore = localStorage.getItem(rangeKey);
 
         const btn = document.createElement('div');
@@ -150,7 +194,7 @@ function renderRanges() {
     // Add Full Shuffle Range
     const fullBtn = document.createElement('div');
     fullBtn.className = 'range-btn full-shuffle-btn';
-    const fullRangeKey = 'score_full_shuffle';
+    const fullRangeKey = `score_${currentSubject}_full_shuffle`;
     const savedFull = localStorage.getItem(fullRangeKey);
 
     let fullScoreHtml = '';
@@ -180,7 +224,7 @@ function renderRanges() {
 }
 
 function startFullShuffleTest() {
-    currentRangeKey = 'score_full_shuffle';
+    currentRangeKey = `score_${currentSubject}_full_shuffle`;
     // Shuffle all questions and pick first 25
     currentTestSet = shuffle([...allQuestions]).slice(0, SET_SIZE).map(q => ({
         ...q,
@@ -412,18 +456,34 @@ function finishTest() {
         totalQuestionsSpan.innerText = currentTestSet.length;
 
         let msg = "";
-        if (score < 10) {
-            msg = `"${score}" tayam ishlidimi churka bor boshqatdan tayyorlanib kel`;
-        } else if (score < 15) {
-            msg = `Bleee yarmiini zo'rg'a ishlading`;
-        } else if (score < 20) {
-            msg = `Yaxshi Bratishka "${score}" ta ishlabsan`;
-        } else if (score < 24) {
-            msg = `Eee gap yo'g'e "${score}" ta ishlabsan`;
-        } else if (score === 24) {
-            msg = `Ha Chumo 24 ta ishlagansan 1 tayam xato qiladimi`;
+        if (currentSubject === 'xalqaro') {
+            if (score < 10) {
+                msg = `"${score}" tayam ishlidimi churka bor boshqatdan tayyorlanib kel`;
+            } else if (score < 15) {
+                msg = `Bleee yarmiini zo'rg'a ishlading`;
+            } else if (score < 20) {
+                msg = `Yaxshi Bratishka "${score}" ta ishlabsan`;
+            } else if (score < 24) {
+                msg = `Eee gap yo'g'e "${score}" ta ishlabsan`;
+            } else if (score === 24) {
+                msg = `Ha Chumo 24 ta ishlagansan 1 tayam xato qiladimi`;
+            } else {
+                msg = `25 ta ishlabman deb kibirlanma`;
+            }
         } else {
-            msg = `25 ta ishlabman deb kibirlanma`;
+            if (score < 10) {
+                msg = `"${score}" tayam ishlidimi birodar, bu nima qilganingiz insofdanmi? Boshqatdan urinib ko'ring.`;
+            } else if (score < 15) {
+                msg = `Yarmini zo'rg'a ishlabsiz, kayfiyatingizni tushirmang, yana o'qing.`;
+            } else if (score < 20) {
+                msg = `Yaxshi birodar, "${score}" ta ishlabsiz, harakatingiz yomon emas.`;
+            } else if (score < 24) {
+                msg = `Barakalla, "${score}" ta ishlabsiz, ajoyib natija.`;
+            } else if (score === 24) {
+                msg = `Juda ajoyib, 24 ta ishlabsiz, bittagina xato qilibsiz-a!`;
+            } else {
+                msg = `Mukammal natija, 25 ta to'g'ri, lekin kibrlanmang, o'rganishda davom eting.`;
+            }
         }
 
         document.getElementById('result-message').innerText = msg;
