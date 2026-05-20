@@ -11,6 +11,7 @@ const subjectScreen = document.getElementById('subject-screen');
 const setupTitle = document.getElementById('setup-title');
 const subjectXalqaroBtn = document.getElementById('subject-xalqaro-btn');
 const subjectIslomiyBtn = document.getElementById('subject-islomiy-btn');
+const subjectKirishBtn = document.getElementById('subject-kirish-btn');
 const backToSubjectBtn = document.getElementById('back-to-subject-btn');
 
 const setupScreen = document.getElementById('setup-screen');
@@ -86,6 +87,7 @@ function goToHome() {
 function init() {
     subjectXalqaroBtn.addEventListener('click', () => loadSubject('xalqaro'));
     subjectIslomiyBtn.addEventListener('click', () => loadSubject('islomiy'));
+    subjectKirishBtn.addEventListener('click', () => loadSubject('kirish'));
     backToSubjectBtn.addEventListener('click', goToSubjects);
 }
 
@@ -107,12 +109,17 @@ async function loadSubject(subject) {
     
     if (subject === 'xalqaro') {
         setupTitle.innerText = "Xalqaro moliyadan";
-    } else {
+    } else if (subject === 'islomiy') {
         setupTitle.innerText = "Islomiy Bank ishidan";
+    } else if (subject === 'kirish') {
+        setupTitle.innerText = "Bank ishiga kirish";
     }
 
     try {
-        const fileName = subject === 'xalqaro' ? '/test.md' : '/test2.md';
+        let fileName = '/test.md';
+        if (subject === 'islomiy') fileName = '/test2.md';
+        else if (subject === 'kirish') fileName = '/test3.md';
+        
         const response = await fetch(fileName);
         if (!response.ok) throw new Error('Fayl topilmadi');
         const text = await response.text();
