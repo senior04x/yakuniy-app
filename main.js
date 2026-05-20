@@ -295,7 +295,7 @@ function startReviewMode(rangeKey) {
             const selectedText = userAnswers[qIdx];
 
             Array.from(optsDiv.children).forEach(child => {
-                const optText = child.innerText;
+                const optText = child.dataset.text;
                 const isCorrect = q.options.find(o => o.text === optText)?.isCorrect;
 
                 if (isCorrect) {
@@ -362,6 +362,7 @@ function renderQuestions(isReview = false) {
             if (isReview && userAnswers[qIdx] === opt.text) {
                 optCard.classList.add('selected');
             }
+            optCard.dataset.text = opt.text;
             optCard.innerText = opt.text;
             optCard.addEventListener('click', () => {
                 if (isReview) return;
@@ -381,7 +382,7 @@ function renderQuestions(isReview = false) {
                     optCard.classList.add('wrong');
                     // Xato javob belgilanganida to'g'risini ham yashil qilib ko'rsatish
                     Array.from(optsDiv.children).forEach(child => {
-                        const childOriginalOpt = q.options.find(o => o.text === child.innerText);
+                        const childOriginalOpt = q.options.find(o => o.text === child.dataset.text);
                         if (childOriginalOpt && childOriginalOpt.isCorrect) {
                             child.classList.add('correct');
                         }
@@ -430,7 +431,7 @@ function finishTest() {
         const selectedText = userAnswers[qIdx];
 
         Array.from(optsDiv.children).forEach(child => {
-            const optText = child.innerText;
+            const optText = child.dataset.text;
             const originalOpt = q.options.find(o => o.text === optText);
 
             if (originalOpt.isCorrect) {
@@ -455,44 +456,43 @@ function finishTest() {
     };
     localStorage.setItem(currentRangeKey, JSON.stringify(resultData));
 
-    setTimeout(() => {
-        testScreen.classList.add('hidden');
-        resultScreen.classList.remove('hidden');
+    testScreen.classList.add('hidden');
+    resultScreen.classList.remove('hidden');
+    window.scrollTo(0, 0);
 
-        finalScore.innerText = score;
-        totalQuestionsSpan.innerText = currentTestSet.length;
+    finalScore.innerText = score;
+    totalQuestionsSpan.innerText = currentTestSet.length;
 
-        let msg = "";
-        if (currentSubject === 'xalqaro') {
-            if (score < 10) {
-                msg = `"${score}" tayam ishlidimi churka bor boshqatdan tayyorlanib kel`;
-            } else if (score < 15) {
-                msg = `Bleee yarmiini zo'rg'a ishlading`;
-            } else if (score < 20) {
-                msg = `Yaxshi Bratishka "${score}" ta ishlabsan`;
-            } else if (score < 24) {
-                msg = `Eee gap yo'g'e "${score}" ta ishlabsan`;
-            } else if (score === 24) {
-                msg = `Ha Chumo 24 ta ishlagansan 1 tayam xato qiladimi`;
-            } else {
-                msg = `25 ta ishlabman deb kibirlanma`;
-            }
+    let msg = "";
+    if (currentSubject === 'xalqaro') {
+        if (score < 10) {
+            msg = `"${score}" tayam ishlidimi churka bor boshqatdan tayyorlanib kel`;
+        } else if (score < 15) {
+            msg = `Bleee yarmiini zo'rg'a ishlading`;
+        } else if (score < 20) {
+            msg = `Yaxshi Bratishka "${score}" ta ishlabsan`;
+        } else if (score < 24) {
+            msg = `Eee gap yo'g'e "${score}" ta ishlabsan`;
+        } else if (score === 24) {
+            msg = `Ha Chumo 24 ta ishlagansan 1 tayam xato qiladimi`;
         } else {
-            if (score < 10) {
-                msg = `"${score}" tayam ishlidimi birodar, bu nima qilganingiz insofdanmi? Boshqatdan urinib ko'ring.`;
-            } else if (score < 15) {
-                msg = `Yarmini zo'rg'a ishlabsiz, kayfiyatingizni tushirmang, yana o'qing.`;
-            } else if (score < 20) {
-                msg = `Yaxshi birodar, "${score}" ta ishlabsiz, harakatingiz yomon emas.`;
-            } else if (score < 24) {
-                msg = `Barakalla, "${score}" ta ishlabsiz, ajoyib natija.`;
-            } else if (score === 24) {
-                msg = `Juda ajoyib, 24 ta ishlabsiz, bittagina xato qilibsiz-a!`;
-            } else {
-                msg = `Mukammal natija, 25 ta to'g'ri, lekin kibrlanmang, o'rganishda davom eting.`;
-            }
+            msg = `25 ta ishlabman deb kibirlanma`;
         }
+    } else {
+        if (score < 10) {
+            msg = `"${score}" tayam ishlidimi birodar, bu nima qilganingiz insofdanmi? Boshqatdan urinib ko'ring.`;
+        } else if (score < 15) {
+            msg = `Yarmini zo'rg'a ishlabsiz, kayfiyatingizni tushirmang, yana o'qing.`;
+        } else if (score < 20) {
+            msg = `Yaxshi birodar, "${score}" ta ishlabsiz, harakatingiz yomon emas.`;
+        } else if (score < 24) {
+            msg = `Barakalla, "${score}" ta ishlabsiz, ajoyib natija.`;
+        } else if (score === 24) {
+            msg = `Juda ajoyib, 24 ta ishlabsiz, bittagina xato qilibsiz-a!`;
+        } else {
+            msg = `Mukammal natija, 25 ta to'g'ri, lekin kibrlanmang, o'rganishda davom eting.`;
+        }
+    }
 
-        document.getElementById('result-message').innerText = msg;
-    }, 2000);
+    document.getElementById('result-message').innerText = msg;
 }
