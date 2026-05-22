@@ -10,6 +10,76 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
+  <style>
+    /* Custom Select */
+    .custom-select {
+      position: relative;
+      width: 100%;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    
+    .custom-select .select-selected {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s;
+    }
+    
+    .custom-select .select-selected:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .custom-select .select-selected:after {
+      content: "";
+      border: 6px solid transparent;
+      border-color: var(--text) transparent transparent transparent;
+      margin-top: 6px;
+    }
+    
+    .custom-select .select-selected.select-arrow-active:after {
+      border-color: transparent transparent var(--text) transparent;
+      margin-top: -6px;
+    }
+    
+    .custom-select .select-items {
+      position: absolute;
+      background-color: #1e293b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 99;
+      margin-top: 5px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    
+    .custom-select .select-hide {
+      display: none;
+    }
+    
+    .custom-select .select-items div {
+      color: var(--text);
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    
+    .custom-select .select-items div:hover,
+    .custom-select .select-items div.same-as-selected {
+      background-color: rgba(99, 102, 241, 0.2);
+    }
+  </style>
 </head>
 
 <body>
@@ -37,6 +107,18 @@
       </header>
 
       <div class="input-area" id="input-area">
+        <div class="timer-selection" style="margin-bottom: 20px; text-align: left;">
+          <label for="timer-select" style="font-weight: 600; font-size: 1.1rem; color: var(--text);">Vaqtni tanlang (har bir savol uchun):</label>
+          <div class="custom-select" id="timer-select-wrapper" style="margin-top: 8px;">
+            <div class="select-selected" id="timer-select-display">Taymerni tanlang...</div>
+            <div class="select-items select-hide" id="timer-select-options">
+              <div data-value="0">Vaqt tanlanmasin</div>
+              <div data-value="30">30 sekund</div>
+              <div data-value="60">1 daqiqa</div>
+              <div data-value="120">2 daqiqa</div>
+            </div>
+          </div>
+        </div>
         <h2>Test bo'limini tanlang</h2>
         <div id="range-container" class="range-grid">
           <!-- Range buttons will be generated here -->
@@ -94,6 +176,29 @@
           <button id="modal-continue-btn" class="secondary-btn">Davom etish</button>
           <button id="modal-exit-btn" class="danger-btn">Chiqish</button>
           <button id="modal-finish-btn" class="primary-btn finish-btn">Yakunlash</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timer Selection Modal -->
+    <div id="timer-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h3>Taymerni tanlang</h3>
+        <p>Testlarni ishlash uchun har bir savolga ajratiladigan vaqtni belgilang:</p>
+        <div class="timer-selection" style="margin-bottom: 25px; text-align: left;">
+          <div class="custom-select" id="modal-timer-select-wrapper">
+            <div class="select-selected" id="modal-timer-select-display">Taymerni tanlang...</div>
+            <div class="select-items select-hide" id="modal-timer-select-options">
+              <div data-value="0">Vaqt tanlanmasin</div>
+              <div data-value="30">30 sekund</div>
+              <div data-value="60">1 daqiqa</div>
+              <div data-value="120">2 daqiqa</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="modal-timer-cancel-btn" class="secondary-btn">Bekor qilish</button>
+          <button id="modal-timer-start-btn" class="primary-btn">Boshlash</button>
         </div>
       </div>
     </div>
