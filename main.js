@@ -269,7 +269,12 @@ function renderRanges() {
         if (savedScore !== null) {
             try {
                 const data = JSON.parse(savedScore);
-                scoreHtml = `<div class="range-score review-link" data-key="${rangeKey}">Oxirgi natija: ${data.score} / ${data.total} <br><span>(Ko'rish)</span></div>`;
+                scoreHtml = `<div class="range-score" style="cursor: default">
+                    Oxirgi natija: ${data.score} / ${data.total} <br>
+                    <span class="review-link" data-key="${rangeKey}" style="cursor: pointer">(Ko'rish)</span>
+                    <br>
+                    <span class="retry-saved-mistakes-link" style="color: #ef4444; cursor: pointer; text-decoration: underline; margin-top: 5px; display: inline-block;" data-key="${rangeKey}">Faqat xatolarni ishlash</span>
+                </div>`;
             } catch (e) {
                 scoreHtml = `<div class="range-score review-link" data-key="${rangeKey}">Oxirgi natija: ${savedScore} / ${end - start} <br><span>(Ko'rish)</span></div>`;
             }
@@ -282,6 +287,11 @@ function renderRanges() {
         `;
 
         btn.addEventListener('click', (e) => {
+            if (e.target.closest('.retry-saved-mistakes-link')) {
+                e.stopPropagation();
+                startSavedMistakesTest(rangeKey);
+                return;
+            }
             if (e.target.closest('.review-link')) {
                 e.stopPropagation();
                 startReviewMode(rangeKey);
@@ -302,7 +312,12 @@ function renderRanges() {
     if (savedFull !== null) {
         try {
             const data = JSON.parse(savedFull);
-            fullScoreHtml = `<div class="range-score review-link" data-key="${fullRangeKey}">Oxirgi natija: ${data.score} / ${data.total} <br><span>(Ko'rish)</span></div>`;
+            fullScoreHtml = `<div class="range-score" style="cursor: default">
+                Oxirgi natija: ${data.score} / ${data.total} <br>
+                <span class="review-link" data-key="${fullRangeKey}" style="cursor: pointer">(Ko'rish)</span>
+                <br>
+                <span class="retry-saved-mistakes-link" style="color: #ef4444; cursor: pointer; text-decoration: underline; margin-top: 5px; display: inline-block;" data-key="${fullRangeKey}">Faqat xatolarni ishlash</span>
+            </div>`;
         } catch (e) {
             fullScoreHtml = `<div class="range-score review-link" data-key="${fullRangeKey}">Oxirgi natija: ${savedFull} <br><span>(Ko'rish)</span></div>`;
         }
@@ -314,6 +329,11 @@ function renderRanges() {
         ${fullScoreHtml}
     `;
     fullBtn.addEventListener('click', (e) => {
+        if (e.target.closest('.retry-saved-mistakes-link')) {
+            e.stopPropagation();
+            startSavedMistakesTest(fullRangeKey);
+            return;
+        }
         if (e.target.closest('.review-link')) {
             e.stopPropagation();
             startReviewMode(fullRangeKey);
@@ -415,6 +435,35 @@ function startReviewMode(rangeKey) {
     }, 100);
 
     window.scrollTo(0, 0);
+}
+
+function startSavedMistakesTest(rangeKey) {
+    const savedData = localStorage.getItem(rangeKey);
+    if (!savedData) return;
+    try {
+        const data = JSON.parse(savedData);
+        let mistakes = [];
+        data.questions.forEach((q, qIdx) => {
+            const selectedText = data.userAnswers[qIdx];
+            let isCorrect = false;
+            if (selectedText) {
+                const originalOpt = q.options.find(o => o.text === selectedText);
+                if (originalOpt && originalOpt.isCorrect) isCorrect = true;
+            }
+            if (!isCorrect) {
+                mistakes.push(q);
+            }
+        });
+        
+        if (mistakes.length === 0) {
+            alert("Sizda xatolar yo'q!");
+            return;
+        }
+        
+        startRetryMistakesTest(mistakes);
+    } catch (e) {
+        alert("Batafsil ma'lumot topilmadi.");
+    }
 }
 
 function startTestRange(start, end, rangeKey) {
@@ -652,6 +701,39 @@ function finishTest() {
     }
 
     document.getElementById('result-message').innerText = msg;
+}
+
+function startRetryMistakesTest(questions) {
+    if (selectedTimerValue === "") {
+        pendingTestFunction = () => startRetryMistakesTest(questions);
+        timerModal.classList.remove('hidden');
+        return;
+    }
+
+    currentTestSet = questions.map(q => ({
+        ...q,
+        shuffledOptions: shuffle([...q.options])
+    }));
+
+    userAnswers = {};
+    isTestActive = true;
+    isReviewMode = false;
+    setupScreen.classList.add('hidden');
+    resultScreen.classList.add('hidden');
+    testScreen.classList.remove('hidden');
+
+    selectedTimer = selectedTimerValue ? parseInt(selectedTimerValue) : 0;
+    isQuizMode = selectedTimer > 0;
+    currentQuestionIndex = 0;
+
+    rangeDisplay.innerText = `Xatolarni qayta ishlash (${questions.length} ta)`;
+    finishBtns.forEach(btn => btn.classList.remove('hidden'));
+    backHomeBtn.classList.remove('hidden'); 
+    
+    renderQuestions();
+    renderNavigator();
+    if (isQuizMode) startQuestionTimer();
+    window.scrollTo(0, 0);
 }
 
 // Timer Helper Functions
