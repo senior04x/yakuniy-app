@@ -170,7 +170,7 @@ header p {
   justify-content: space-between;
   align-items: center;
   margin: -40px -40px 40px -40px;
-  padding: 30px 40px 20px 40px; /* Increased top padding for safe area */
+  padding: 50px 40px 20px 40px; /* Doubled top padding for safe area */
   position: sticky;
   top: 0; /* Changed from -40px to 0 so it stays visible */
   background: #0f172a; /* Darker blue background */
@@ -375,12 +375,12 @@ header p {
   .container {
     padding: 20px;
     width: 95%;
-    margin: 50px auto 10px auto; /* Increased top margin for Telegram safe area */
+    margin: 100px auto 10px auto; /* Doubled top margin for Telegram safe area */
   }
 
   .test-header {
     margin: -20px -20px 20px -20px;
-    padding: 30px 20px 15px 20px; /* Added extra top padding */
+    padding: 50px 20px 15px 20px; /* Doubled top padding */
     border-radius: 20px 20px 0 0;
     top: 0; /* Ensure it stays sticky below the safe area */
   }
